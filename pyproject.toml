@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "telemachus-cli"
+version = "0.1.0"
+description = "CLI for Telemachus Core validation and conversion"
+authors = [{name = "Telemachus Project"}]
+license = {text = "AGPL-3.0"}
+dependencies = [
+  "telemachus @ git+https://github.com/telemachus3/telemachus-py.git",
+  "pandas",
+  "pyarrow",
+  "fastparquet",
+  "jsonschema"
+]
+
+[project.scripts]
+telemachus = "cli.main:main"

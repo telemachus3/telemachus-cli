@@ -7,6 +7,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Test CLI
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+      - name: Install CLI
+        run: pip install .
+      - name: Smoke tests
         run: |
-          python -m cli.main validate examples/geotab.jsonl || true
+          telemachus --help
+          python - <<'PY'
+from cli.main import main
+print("OK")
+PY
+      - name: Build Docker image
+        run: |
+          docker build -t telemachus-cli:latest .
+          docker run --rm telemachus-cli:latest --help
