@@ -1,22 +1,23 @@
-import argparse
-import json
+import argparse, sys, json
 from telemachus.validate import validate
 
 def main():
-    parser = argparse.ArgumentParser(prog="telemachus")
-    sub = parser.add_subparsers(dest="command")
+    p = argparse.ArgumentParser(prog="telemachus")
+    sub = p.add_subparsers(dest="cmd", required=True)
 
-    val = sub.add_parser("validate", help="Validate a JSONL file")
-    val.add_argument("file", help="Path to JSONL file")
+    v = sub.add_parser("validate", help="Validate a JSONL file against Telemachus schema")
+    v.add_argument("file", help="Path to JSONL file")
+    v.add_argument("--schema", help="Schema path or URL (optional)", default=None)
 
-    args = parser.parse_args()
-
-    if args.command == "validate":
-        errors = validate(args.file)
-        if any(errors):
-            print("Validation errors found:", errors)
-        else:
-            print("All records valid!")
+    args = p.parse_args()
+    if args.cmd == "validate":
+        res = validate(args.file, schema=args.schema)
+        if res["ok"]:
+            print("✅ All records valid!")
+            sys.exit(0)
+        print("❌ Validation errors:")
+        print(json.dumps(res, indent=2, ensure_ascii=False))
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()
