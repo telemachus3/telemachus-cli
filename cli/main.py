@@ -65,6 +65,19 @@ def cmd_tcs(args):
             for k, _ in missing[:20]:
                 print(f" - {k}")
 
+def cmd_adapt(args):
+    from cli.adapters import ADAPTERS
+    source = args.source.lower()
+    if source not in ADAPTERS:
+        print(f"Unknown source '{source}'. Available: {', '.join(ADAPTERS)}", file=sys.stderr)
+        sys.exit(1)
+    import importlib
+    mod = importlib.import_module(ADAPTERS[source])
+    print(f"Adapting {source} -> Telemachus D0 ...")
+    results = mod.adapt(args.input, args.output)
+    print(f"Done: {len(results)} trip(s) converted.")
+
+
 def main():
     p = argparse.ArgumentParser(prog="telemachus")
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -84,6 +97,12 @@ def main():
     t.add_argument("input", help="Path to file (JSON/JSONL/Parquet)")
     t.add_argument("--json", action="store_true", help="Output JSON")
     t.set_defaults(func=cmd_tcs)
+
+    a = sub.add_parser("adapt", help="Convert third-party dataset to Telemachus D0")
+    a.add_argument("--source", required=True, help="Source format (e.g., uah-driveset)")
+    a.add_argument("input", help="Input directory containing source data")
+    a.add_argument("-o", "--output", required=True, help="Output directory for D0 Parquet files")
+    a.set_defaults(func=cmd_adapt)
 
     args = p.parse_args()
     args.func(args)
