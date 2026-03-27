@@ -3,4 +3,5 @@
 ADAPTERS = {
     "uah-driveset": "cli.adapters.uah_driveset",
     "aegis": "cli.adapters.aegis",
+    "pvs": "cli.adapters.pvs",
 }
